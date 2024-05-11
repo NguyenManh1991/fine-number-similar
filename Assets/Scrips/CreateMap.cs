@@ -7,20 +7,20 @@ using UnityEngine.Tilemaps;
 
 public class CreateMap : MonoBehaviour
 {
-    [SerializeField] GameObject purdah;
-    [SerializeField] Tile map;
-    [SerializeField] int columb, row;
-    [SerializeField] Dictionary<Vector3, GameObject> dicPurdah = new();
-    GameObject purdah1;
-    Vector3 hitPosition;
-    List<Tile> list = new();
-    [SerializeField] List<int> list2 = new List<int>();
-    [SerializeField]int h = 2;
     
+    [SerializeField] Tile tiles;
+    [SerializeField] int columb, row;
+
+    Tile check;
+    Vector3 hitPosition;
+    Dictionary<Vector3,Tile> dicTile = new();
+    [SerializeField] List<int> numberValue = new List<int>();
+    [SerializeField] int setLength = 2;
+    [SerializeField] float delayTime = 0.7f;
     private void Start()
     {
         SetMap();
-        SetPordah();
+        
         RandomShuffle();
     }
     private void Update()
@@ -33,32 +33,17 @@ public class CreateMap : MonoBehaviour
         {
             for (int j = 0; j < row; j++)
             {
-                var tile = Instantiate(map);
+                var tile = Instantiate(tiles);
                 Vector3 tilePosition;
                 tilePosition.x = i; tilePosition.y = j; tilePosition.z = 0;
-                tile.transform.position = tilePosition; 
+                tile.transform.position = tilePosition;
                 tile.transform.SetParent(transform, false);
-                list.Add(tile);
+                dicTile.Add(tilePosition,tile);
 
             }
         }
     }
-    void SetPordah()
-    {
-        for (int i = 0; i < columb; i++)
-        {
-            for (int j = 0; j < row; j++)
-            {
-                purdah1 = Instantiate(purdah);
-                Vector3 tilePosition;
-                tilePosition.x = i; tilePosition.y = j; tilePosition.z = -0.5f;
-                purdah1.transform.position = tilePosition;
-                purdah1.transform.SetParent(transform, false);
-                dicPurdah.Add(tilePosition, purdah1);
-                //listPurdah[i].SetActive(false);
-            }
-        }
-    }
+    
 
     void Raycat()
     {
@@ -69,15 +54,27 @@ public class CreateMap : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 100))
             {
-
                 hitPosition = hit.transform.position;
-                if (dicPurdah.ContainsKey(hitPosition))
+                if (dicTile.ContainsKey(hitPosition))
                 {
-                    dicPurdah[hitPosition].SetActive(false);
-
-
-
+                    dicTile[hitPosition].TurnOnPurdah();
+                    if (check != null)
+                    {
+                        if (dicTile[hitPosition].tileValue == check.tileValue)
+                        {
+                            if (check.transform.position == hitPosition)
+                            {
+                                return;
+                            }
+                            dicTile[hitPosition].TurnOffPurdah();
+                            check.TurnOffPurdah();
+                            check = null;
+                        }
+                    }
+                    check = dicTile[hitPosition];
+                    StartCoroutine(ResetCheck());                   
                 }
+                
             }
         }
 
@@ -86,28 +83,37 @@ public class CreateMap : MonoBehaviour
     void RandomShuffle()
     {
         Random();
-        list2.Shuffle();
-
-        for (int i = 0; i < list2.Count; i++)
+        numberValue.Shuffle();
+        int count = 0;
+        foreach(var item in dicTile)
         {
-            list[i].SetText($"{list2[i]}");
+            item.Value.SetDelayTime(delayTime);
+            item.Value.SetText(numberValue[count]);
+            count++;
         }
 
     }
     void Random()
     {
-        list2.Clear();
-        if (h % 2 != 0) { return; }
-        if ((row * columb) % h != 0)
+        numberValue.Clear();
+        if (setLength % 2 != 0) { return; }
+        if ((row * columb) % setLength != 0)
         {
             return;
         }
-        for (int i = 0; i < (row * columb) / h; i++)
+        for (int i = 0; i < (row * columb) / setLength; i++)
         {
-            for (int j = 0; j < h; j++)
+            for (int j = 0; j < setLength; j++)
             {
-                list2.Add(i);
+                numberValue.Add(i);
             }
         }
     }
+
+    IEnumerator ResetCheck() 
+    {
+        yield return new WaitForSeconds(delayTime);
+        check= null;    
+    }
+
 }

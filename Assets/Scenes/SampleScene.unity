@@ -330,12 +330,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad06c00f0dc099479dff3684fd1434c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  purdah: {fileID: 4938693979385965998, guid: ff98f959b9c42254b8a083d4f3c608f8, type: 3}
-  map: {fileID: 7433722303906816893, guid: 30121cd7de4b4b44daacb8fa53b4f587, type: 3}
+  tiles: {fileID: 7433722303906816893, guid: 30121cd7de4b4b44daacb8fa53b4f587, type: 3}
   columb: 6
   row: 6
-  list2: 
-  h: 2
+  numberValue: 
+  setLength: 2
+  delayTime: 1
 --- !u!4 &1349758407
 Transform:
   m_ObjectHideFlags: 0
